@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# TypeScript Type Imports/Exports
+
+When working with TypeScript files in this project, please prefer using type-only imports and exports whenever you are dealing exclusively with types or interfaces.
+
+-   Use `import type { MyType } from './my-module';` instead of `import { MyType } from './my-module';`.
+-   Use `export type { MyType } from './my-module';` instead of `export { MyType } from './my-module';` when re-exporting types.
+-   Use `export type { MyInterfaceOrType }` instead of `export { MyInterfaceOrType }` when exporting a type or interface definition.
+
+This practice helps maintain clean code and is often necessary when the `isolatedModules` TypeScript compiler option is enabled, which is common in modern projects. Adhering to this helps prevent potential build or runtime issues.
