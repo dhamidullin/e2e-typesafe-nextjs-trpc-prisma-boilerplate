@@ -9,7 +9,7 @@
 import { createTRPCReact } from '@trpc/react-query';
 import { type AppRouter } from '../server/api/root';
 import superjson from 'superjson';
-import { httpBatchLink, loggerLink } from '@trpc/client';
+import { httpBatchLink, loggerLink, createTRPCClient } from '@trpc/client';
 
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') return ''; // browser should use relative url
@@ -17,8 +17,8 @@ const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
-/** A set of typesafe hooks for consuming your tRPC API. */
-export const api = createTRPCReact<AppRouter>({});
+/** A set of typesafe React hooks for consuming your tRPC API. */
+export const reactClient = createTRPCReact<AppRouter>({});
 
 /**
  * A wrapper for your app that provides the TRPC context.
@@ -41,16 +41,9 @@ export type RouterInputs = AppRouter['_def']['record'];
 export type RouterOutputs = AppRouter['_def']['record'];
 
 /**
- * Client-side tRPC configuration
+ * Client-side tRPC configuration shared by hooks and vanilla client
  */
 export const trpcClientOptions = {
-  transformer: superjson,
-
-  /**
-   * Links used to determine request flow from client to server.
-   *
-   * @see https://trpc.io/docs/links
-   */
   links: [
     loggerLink({
       enabled: (opts) =>
@@ -58,7 +51,11 @@ export const trpcClientOptions = {
         (opts.direction === 'down' && opts.result instanceof Error),
     }),
     httpBatchLink({
+      transformer: superjson,
       url: `${getBaseUrl()}/api/trpc`,
     }),
   ],
-}; 
+};
+
+/** Create a vanilla tRPC client for non-hook usage */
+export const vanillaClient = createTRPCClient<AppRouter>(trpcClientOptions); 
